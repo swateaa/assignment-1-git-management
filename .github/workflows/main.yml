@@ -1,0 +1,43 @@
+name: Food Delivery CI/CD
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check application files
+        run: |
+          test -f index.html
+          test -f style.css
+          test -f script.js
+          echo "All application files are present."
+
+      - name: Test HTML
+        run: |
+          grep -q "<html" index.html
+          grep -q "</html>" index.html
+          echo "HTML test passed."
+
+      - name: Package application
+        run: |
+          mkdir food-delivery-app
+          cp index.html style.css script.js food-delivery-app/
+          zip -r food-delivery-app.zip food-delivery-app
+          echo "Application packaged successfully."
+
+      - name: Upload package
+        uses: actions/upload-artifact@v4
+        with:
+          name: food-delivery-app
+          path: food-delivery-app.zip
